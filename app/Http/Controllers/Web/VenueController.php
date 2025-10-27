@@ -9,63 +9,64 @@ use Inertia\Inertia;
 
 class VenueController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return Inertia::render('Venues/Index', [
-            'venues' => Venue::all()
-        ]);
+        $venues = Venue::select('id','venue_name','venue_max_capacity','venue_address','venue_status')
+            ->latest('id')->get();
+
+        return Inertia::render('Venues/Index', ['venues' => $venues]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return Inertia::render('Venues/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'venue_name'         => ['required','string','max:255'],
+            'venue_max_capacity' => ['required','integer','min:1'],
+            'venue_address'      => ['required','string','max:255'],
+            'venue_status'       => ['required','boolean'],
+        ]);
+
+        Venue::create($data);
+
+        return redirect()->route('venues.index')->with('success','Venue creado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Venue $venue)
     {
         return Inertia::render('Venues/Show', [
-            'venue' => $venue
+            'venue' => $venue->only('id','venue_name','venue_max_capacity','venue_address','venue_status'),
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Venue $venue)
     {
-        //
+        return Inertia::render('Venues/Edit', [
+            'venue' => $venue->only('id','venue_name','venue_max_capacity','venue_address','venue_status'),
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Venue $venue)
     {
-        //
+        $data = $request->validate([
+            'venue_name'         => ['required','string','max:255'],
+            'venue_max_capacity' => ['required','integer','min:1'],
+            'venue_address'      => ['required','string','max:255'],
+            'venue_status'       => ['required','boolean'],
+        ]);
+
+        $venue->update($data);
+
+        return redirect()->route('venues.index')->with('success','Venue actualizado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Venue $venue)
     {
-        //
+        $venue->delete();
+        return redirect()->route('venues.index')->with('success','Venue eliminado correctamente.');
     }
 }
