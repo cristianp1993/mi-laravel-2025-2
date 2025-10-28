@@ -1,20 +1,20 @@
 <?php
 
-use App\Http\Controllers\Web\VenueController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
 use Inertia\Inertia;
+
+use App\Http\Controllers\Web\VenueController;
+use App\Http\Controllers\Web\EventController as WebEventController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'canLogin'      => Route::has('login'),
+        'canRegister'   => Route::has('register'),
+        'laravelVersion'=> Application::VERSION,
+        'phpVersion'    => PHP_VERSION,
     ]);
 });
-
-
 
 Route::middleware([
     'auth:sanctum',
@@ -24,5 +24,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
     Route::resource('venues', VenueController::class);
+    Route::resource('events', WebEventController::class);
+    Route::post('events/{event}', [WebEventController::class, 'update'])->name('events.update');
 });
